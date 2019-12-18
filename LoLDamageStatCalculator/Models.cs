@@ -14,13 +14,15 @@ namespace LoLDamageStatCalculator
 {
     public class Models
     {
-        public List<string> Champions;
-
         public List<DComboBox> ChampionsViewable;
+
+        public List<ChampionStatic> ChampionData;
 
         public ChampionStatic Champion;
 
         public int ChampionLevel;
+
+        public Constants.SummaryType ChampionSummaryType;
     }
 
     public class DComboBox

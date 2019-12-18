@@ -23,13 +23,6 @@ namespace LoLDamageStatCalculator
             //var x = api.StaticData.
         }
 
-        public async Task<List<DComboBox>> GetViewableChampionList()
-        {
-            ChampionListStatic ChampionsList = await GetChampionList();
-            
-            return ChampionsList.Champions.Select(c => new DComboBox { ID = c.Value.Key, Name = c.Value.Name }).ToList();
-        }
-
         public async Task<ChampionStatic> GetChampion(string ChampionName)
         {
             try
@@ -45,7 +38,7 @@ namespace LoLDamageStatCalculator
             
         }
 
-        public async Task<ChampionListStatic> GetChampionList()
+        public async Task<ChampionListStatic> GetChampions()
         {
             ChampionListStatic ChampionsList = await ApiInstance.Champions.GetAllAsync(Constants.StaticChampionVersion, Language.en_US, true);
             return ChampionsList;

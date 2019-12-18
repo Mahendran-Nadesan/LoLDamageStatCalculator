@@ -28,7 +28,7 @@ namespace LoLDamageStatCalculator
             throw new NotImplementedException();
         }
 
-        public Task<ChampionListStatic> GetChampionList()
+        public Task<ChampionListStatic> GetChampions()
         {
             throw new NotImplementedException();
         }

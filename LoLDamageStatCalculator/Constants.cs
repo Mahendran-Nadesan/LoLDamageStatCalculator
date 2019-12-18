@@ -15,7 +15,11 @@ namespace LoLDamageStatCalculator
         public enum SummaryType
         {
             BaseStats,
-            SpellStats
+            PassiveStats,
+            QStats,
+            WStats,
+            EStats,
+            RStats
         }
             
 
