@@ -15,7 +15,7 @@ namespace LoLDamageStatCalculator
     public class OnlineMode : IMode
     {
         private IStaticDataEndpoints ApiInstance;
-     
+
         public OnlineMode()
         {
             ApiInstance = StaticDataEndpoints.GetInstance(true); // uses cache
@@ -35,13 +35,20 @@ namespace LoLDamageStatCalculator
                 Console.WriteLine(ex.Message);
                 throw ex;
             }
-            
         }
 
         public async Task<ChampionListStatic> GetChampions()
         {
-            ChampionListStatic ChampionsList = await ApiInstance.Champions.GetAllAsync(Constants.StaticChampionVersion, Language.en_US, true);
-            return ChampionsList;
+            try
+            {
+                ChampionListStatic ChampionsList = await ApiInstance.Champions.GetAllAsync(Constants.StaticChampionVersion, Language.en_US, true);
+                return ChampionsList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw ex;
+            }
         }
     }
 }

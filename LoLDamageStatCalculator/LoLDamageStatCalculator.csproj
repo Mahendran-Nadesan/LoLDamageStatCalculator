@@ -155,6 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="IMode.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>

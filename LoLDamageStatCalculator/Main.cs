@@ -11,6 +11,7 @@ using RiotSharp;
 using RiotSharp.Endpoints.Interfaces.Static;
 using RiotSharp.Endpoints.StaticDataEndpoint;
 using RiotSharp.Endpoints.StaticDataEndpoint.Champion;
+using RiotSharp.Endpoints.StaticDataEndpoint.Item;
 using RiotSharp.Misc;
 
 
@@ -24,7 +25,6 @@ namespace LoLDamageStatCalculator
     {
         #region PERSISTENT OBJECTS
 
-        RiotSharpAPI _api = null;
         IMode api;
         public Models data;
 
@@ -33,23 +33,6 @@ namespace LoLDamageStatCalculator
         public Main()
         {
             InitializeComponent();
-
-            // set to online mode on start for now, later add a setting to load last mode
-            rbOffline.Enabled = false;
-            rbOnline.Checked = true;
-            SetOnlineMode(true);
-
-            // initial loading
-            try
-            {
-                LoadInitialState();
-
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message);
-            }
-
         }
 
         #region MODE & MODE CHANGING EVENTS
@@ -81,20 +64,87 @@ namespace LoLDamageStatCalculator
 
         #region LOAD METHODS
 
+        private void Main_Load(object sender, EventArgs e)
+        {
+            // set to online mode on start for now, later add a setting to load last mode
+            rbOffline.Enabled = false;
+            rbOnline.Checked = true;
+            SetOnlineMode(true);
+
+            // initial loading
+            try
+            {
+                LoadInitialState();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         private async void LoadInitialState()
         {
             data = new Models
             {
                 ChampionSummaryType = Constants.SummaryType.PassiveStats
             };
-            await GetChampionData();
-            LoadChampionDropdown();
+
+            // non-async stuff
             LoadLevelDropdown();
+            LoadSpellLevelDropdown();
+            cbxLevels.Enabled = false;
+
+            // event handlers
+            //cbxQLevel.SelectedIndexChanged += SetSpellLevel;
+            //cbxWLevel.SelectedIndexChanged += SetSpellLevel;
+            //cbxELevel.SelectedIndexChanged += SetSpellLevel;
+            //cbxRLevel.SelectedIndexChanged += SetSpellLevel;
+
+            // async stuff
+            await GetChampionData();
+
+            LoadChampionDropdown();
 
             //btnQ.Click += RefreshButtons;
             //btnW.Click += RefreshButtons;
             //btnE.Click += RefreshButtons;
             //btnR.Click += RefreshButtons;
+
+            // temp
+            // GetAllSpellTypes();
+
+        }
+
+        private void GetAllSpellTypes()
+        {
+            if (data.ChampionData.Count == 0)
+            {
+                webStats.DocumentText = "No data";
+            }
+
+            List<string> spells = new List<string>();
+
+            foreach (var champ in data.ChampionData)
+            {
+                for (int i = 0; i < champ.Spells.Count; i++)
+                {
+                    if (champ.Spells[i].Vars.Count > 0)
+                    {
+                        foreach (var vars in champ.Spells[i].Vars)
+                        {
+                            spells.Add(vars.Link);
+                        }
+
+                    }
+                }
+            }
+
+            var s = spells.Distinct().ToList();
+            foreach (var item in s)
+            {
+                Console.WriteLine(item);
+            }
 
         }
 
@@ -129,6 +179,31 @@ namespace LoLDamageStatCalculator
             data.ChampionLevel = (int)cbxLevels.SelectedValue;
         }
 
+        private void LoadSpellLevelDropdown()
+        {
+            // did not use addrange(enumerable.range because the levels end up SHARING the datasource)
+
+            cbxQLevel.SelectedIndexChanged -= SetSpellLevel;
+            cbxWLevel.SelectedIndexChanged -= SetSpellLevel;
+            cbxELevel.SelectedIndexChanged -= SetSpellLevel;
+            cbxRLevel.SelectedIndexChanged -= SetSpellLevel;
+
+            cbxQLevel.DataSource = new List<int>() { 0, 1, 2, 3, 4, 5 };
+            cbxWLevel.DataSource = new List<int>() { 0, 1, 2, 3, 4, 5 };
+            cbxELevel.DataSource = new List<int>() { 0, 1, 2, 3, 4, 5 };
+            cbxRLevel.DataSource = new List<int>() { 0, 1, 2, 3 };
+
+            data.ChampionSpellLevels["Q"] = 0;
+            data.ChampionSpellLevels["W"] = 0;
+            data.ChampionSpellLevels["E"] = 0;
+            data.ChampionSpellLevels["R"] = 0;
+
+            cbxQLevel.SelectedIndexChanged += SetSpellLevel;
+            cbxWLevel.SelectedIndexChanged += SetSpellLevel;
+            cbxELevel.SelectedIndexChanged += SetSpellLevel;
+            cbxRLevel.SelectedIndexChanged += SetSpellLevel;
+        }
+
         #endregion
 
         #region SUMMARY & SUMMARY CHANGING EVENTS
@@ -158,55 +233,64 @@ namespace LoLDamageStatCalculator
 
         private void SetSpellSummary()
         {
-            txtSpellSummary.Clear();
+            webStats.DocumentText = "";
             Constants.SummaryType summaryType = data.ChampionSummaryType;
 
-            var champ = data.Champion;
-
-            // the button color code is shit
-            switch (summaryType)
+            if (summaryType == Constants.SummaryType.QStats || summaryType == Constants.SummaryType.WStats || summaryType == Constants.SummaryType.EStats || summaryType == Constants.SummaryType.RStats)
             {
-                case Constants.SummaryType.QStats:
-                    txtSpellSummary.Text += string.Format("{0} Q: {1}", champ.Name, champ.Spells[0].Name);
-                    txtSpellSummary.Text += Environment.NewLine;
-                    txtSpellSummary.Text += champ.Spells[0].Description;
-                    btnW.BackColor = DefaultBackColor;
-                    btnE.BackColor = DefaultBackColor;
-                    btnR.BackColor = DefaultBackColor;
-                    break;
-                case Constants.SummaryType.WStats:
-                    txtSpellSummary.Text += string.Format("{0} W: {1}", champ.Name, champ.Spells[1].Name);
-                    txtSpellSummary.Text += Environment.NewLine;
-                    txtSpellSummary.Text += champ.Spells[1].Description;
-                    btnQ.BackColor = DefaultBackColor;
-                    btnE.BackColor = DefaultBackColor;
-                    btnR.BackColor = DefaultBackColor;
-                    break;
-                case Constants.SummaryType.EStats:
-                    txtSpellSummary.Text += string.Format("{0} E: {1}", champ.Name, champ.Spells[2].Name);
-                    txtSpellSummary.Text += Environment.NewLine;
-                    txtSpellSummary.Text += champ.Spells[2].Description;
-                    btnQ.BackColor = DefaultBackColor;
-                    btnW.BackColor = DefaultBackColor;
-                    btnR.BackColor = DefaultBackColor;
-                    break;
-                case Constants.SummaryType.RStats:
-                    txtSpellSummary.Text += string.Format("{0} R: {1}", champ.Name, champ.Spells[3].Name);
-                    txtSpellSummary.Text += Environment.NewLine;
-                    txtSpellSummary.Text += champ.Spells[3].Description;
-                    btnQ.BackColor = DefaultBackColor;
-                    btnW.BackColor = DefaultBackColor;
-                    btnE.BackColor = DefaultBackColor;
-                    break;
-                default:
-                    break;
+                var champ = data.Champion;
+
+                // the button color code is shit
+                switch (summaryType)
+                {
+                    case Constants.SummaryType.QStats:
+                        // plan:
+                        // get string list of all spells, e.g. [0] = "{{ e1 }}", [1] = "{{ a1 }}"
+                        // loop and replace values:
+                        // for x in list, string.replace([0], GetSpellEffect(...)) etc.
+
+                        // new section - so we can remove the switch statement in the model's functions
+                        data.ChampionSpell = champ.Spells[0];
+                        data.ChampionSpellLevel = data.ChampionSpellLevels["Q"];
+                        btnW.BackColor = DefaultBackColor;
+                        btnE.BackColor = DefaultBackColor;
+                        btnR.BackColor = DefaultBackColor;
+                        break;
+                    case Constants.SummaryType.WStats:
+                        data.ChampionSpell = champ.Spells[1];
+                        data.ChampionSpellLevel = data.ChampionSpellLevels["W"];
+                        btnQ.BackColor = DefaultBackColor;
+                        btnE.BackColor = DefaultBackColor;
+                        btnR.BackColor = DefaultBackColor;
+                        break;
+                    case Constants.SummaryType.EStats:
+                        data.ChampionSpell = champ.Spells[2];
+                        data.ChampionSpellLevel = data.ChampionSpellLevels["E"];
+                        btnQ.BackColor = DefaultBackColor;
+                        btnW.BackColor = DefaultBackColor;
+                        btnR.BackColor = DefaultBackColor;
+                        break;
+                    case Constants.SummaryType.RStats:
+                        data.ChampionSpell = champ.Spells[3];
+                        data.ChampionSpellLevel = data.ChampionSpellLevels["R"];
+                        btnQ.BackColor = DefaultBackColor;
+                        btnW.BackColor = DefaultBackColor;
+                        btnE.BackColor = DefaultBackColor;
+                        break;
+                    default:
+                        break;
+                }
+
+                webStats.DocumentText = data.GetSpellStrings();
             }
+
         }
 
         private void cbxChampions_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbxChampions.SelectedIndex != 0)
             {
+                cbxLevels.Enabled = true;
                 string championKey = cbxChampions.SelectedValue.ToString();
 
                 try
@@ -220,6 +304,10 @@ namespace LoLDamageStatCalculator
                     MessageBox.Show(ex.Message);
                 }
             }
+            else
+            {
+                cbxLevels.Enabled = false;
+            }
         }
 
         private void cbxLevels_SelectedIndexChanged(object sender, EventArgs e)
@@ -228,12 +316,143 @@ namespace LoLDamageStatCalculator
 
             if (data.Champion != null)
                 SetBasicStatsSummary();
+
+            LoadSpellLevelDropdown(); // reset spell levels every time the champ level changes
         }
 
         private void btnChamp_Click(object sender, EventArgs e)
         {
             if (data.Champion != null)
                 SetBasicStatsSummary();
+        }
+
+        #endregion
+
+        #region SPELL & SPELL CHANGING EVENTS
+
+        private void SetSpellLevel(object sender, EventArgs e)
+        {
+            ComboBox cbx = (ComboBox)sender;
+
+            if ((int)cbx.SelectedValue > 0)
+            {
+                int totalSpellLevels = (int)cbxQLevel.SelectedValue + (int)cbxWLevel.SelectedValue + (int)cbxELevel.SelectedValue + (int)cbxRLevel.SelectedValue;
+
+                if (totalSpellLevels > (int)cbxLevels.SelectedValue)
+                {
+                    MessageBox.Show("Champion spell levels cannot be greater than champion level!");
+
+                    // make sure spell level reverts to old value
+                    switch (cbx.Name)
+                    {
+                        case "cbxQLevel":
+                            cbx.SelectedItem = data.ChampionSpellLevels["Q"];
+                            break;
+                        case "cbxWLevel":
+                            cbx.SelectedItem = data.ChampionSpellLevels["W"];
+                            break;
+                        case "cbxELevel":
+                            cbx.SelectedItem = data.ChampionSpellLevels["E"];
+                            break;
+                        case "cbxRLevel":
+                            cbx.SelectedItem = data.ChampionSpellLevels["R"];
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (cbx.Name)
+                    {
+                        case "cbxQLevel":
+                            data.ChampionSpellLevels["Q"] = (int)cbx.SelectedValue;
+                            data.ChampionSummaryType = Constants.SummaryType.QStats;
+                            break;
+                        case "cbxWLevel":
+                            data.ChampionSpellLevels["W"] = (int)cbx.SelectedValue;
+                            data.ChampionSummaryType = Constants.SummaryType.WStats;
+                            break;
+                        case "cbxELevel":
+                            data.ChampionSpellLevels["E"] = (int)cbx.SelectedValue;
+                            data.ChampionSummaryType = Constants.SummaryType.EStats;
+                            break;
+                        case "cbxRLevel":
+                            data.ChampionSpellLevels["R"] = (int)cbx.SelectedValue;
+                            data.ChampionSummaryType = Constants.SummaryType.RStats;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    SetSpellSummary();
+                }
+            }
+        }
+
+        private void btnPassive_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Not implemented yet!");
+        }
+
+        private void btnQ_Click(object sender, EventArgs e)
+        {
+            if ((int)cbxQLevel.SelectedValue < 1)
+            {
+                cbxQLevel.SelectedItem = 1;
+            }
+
+            if (cbxChampions.SelectedIndex != 0 && data.Champion != null)
+            {
+                data.ChampionSummaryType = Constants.SummaryType.QStats;
+                btnQ.BackColor = Color.Red;
+                SetSpellSummary();
+            }
+        }
+
+        private void btnW_Click(object sender, EventArgs e)
+        {
+            if ((int)cbxWLevel.SelectedValue < 1)
+            {
+                cbxWLevel.SelectedItem = 1;
+            }
+
+            if (cbxChampions.SelectedIndex != 0 && data.Champion != null)
+            {
+                data.ChampionSummaryType = Constants.SummaryType.WStats;
+                btnW.BackColor = Color.Red;
+                SetSpellSummary();
+            }
+        }
+
+        private void btnE_Click(object sender, EventArgs e)
+        {
+            if ((int)cbxELevel.SelectedValue < 1)
+            {
+                cbxELevel.SelectedItem = 1;
+            }
+
+            if (cbxChampions.SelectedIndex != 0 && data.Champion != null)
+            {
+                data.ChampionSummaryType = Constants.SummaryType.EStats;
+                btnE.BackColor = Color.Red;
+                SetSpellSummary();
+            }
+        }
+
+        private void btnR_Click(object sender, EventArgs e)
+        {
+            if ((int)cbxRLevel.SelectedValue < 1)
+            {
+                cbxRLevel.SelectedItem = 1;
+            }
+
+            if (cbxChampions.SelectedIndex != 0 && data.Champion != null)
+            {
+                data.ChampionSummaryType = Constants.SummaryType.RStats;
+                btnR.BackColor = Color.Red;
+                SetSpellSummary();
+            }
         }
 
         #endregion
@@ -245,56 +464,22 @@ namespace LoLDamageStatCalculator
             return baseStat + (perLevelStat * (data.ChampionLevel - 1));
         }
 
+        private string ParseSpellText(ChampionSpellStatic champSpell)
+        {
+            string spellText = champSpell.Tooltip;
+
+            //List<int> startBrackets = spellText.F
+
+            return "";
+        }
+
         #endregion
 
         #region UNUSED, TRASH
 
         #endregion
 
-        private void btnPassive_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Not implemented yet!");
-        }
-
-        private void btnQ_Click(object sender, EventArgs e)
-        {
-            if (cbxChampions.SelectedIndex != 0 && data.Champion != null)
-            {
-                data.ChampionSummaryType = Constants.SummaryType.QStats;
-                btnQ.BackColor = Color.Red;
-                SetSpellSummary();
-            }
-        }
-
-        private void btnW_Click(object sender, EventArgs e)
-        {
-            if (cbxChampions.SelectedIndex != 0 && data.Champion != null)
-            {
-                data.ChampionSummaryType = Constants.SummaryType.WStats;
-                btnW.BackColor = Color.Red;
-                SetSpellSummary();
-            }
-        }
-
-        private void btnE_Click(object sender, EventArgs e)
-        {
-            if (cbxChampions.SelectedIndex != 0 && data.Champion != null)
-            {
-                data.ChampionSummaryType = Constants.SummaryType.EStats;
-                btnE.BackColor = Color.Red;
-                SetSpellSummary();
-            }
-        }
-
-        private void btnR_Click(object sender, EventArgs e)
-        {
-            if (cbxChampions.SelectedIndex != 0 && data.Champion != null)
-            {
-                data.ChampionSummaryType = Constants.SummaryType.RStats;
-                btnR.BackColor = Color.Red;
-                SetSpellSummary();
-            }
-        }
+        
 
         void RefreshButtons(object sender, EventArgs e)
         {
@@ -303,6 +488,7 @@ namespace LoLDamageStatCalculator
             btnE.BackColor = Color.Gray;
             btnR.BackColor = Color.Gray;
         }
-    
+
+
     }
 }

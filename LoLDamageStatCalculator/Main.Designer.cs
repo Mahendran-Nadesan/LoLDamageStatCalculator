@@ -41,7 +41,11 @@
             this.btnR = new System.Windows.Forms.Button();
             this.txtSummary = new System.Windows.Forms.TextBox();
             this.btnPassive = new System.Windows.Forms.Button();
-            this.txtSpellSummary = new System.Windows.Forms.TextBox();
+            this.webStats = new System.Windows.Forms.WebBrowser();
+            this.cbxQLevel = new System.Windows.Forms.ComboBox();
+            this.cbxWLevel = new System.Windows.Forms.ComboBox();
+            this.cbxELevel = new System.Windows.Forms.ComboBox();
+            this.cbxRLevel = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -175,20 +179,57 @@
             this.btnPassive.UseVisualStyleBackColor = true;
             this.btnPassive.Click += new System.EventHandler(this.btnPassive_Click);
             // 
-            // txtSpellSummary
+            // webStats
             // 
-            this.txtSpellSummary.Location = new System.Drawing.Point(23, 454);
-            this.txtSpellSummary.Multiline = true;
-            this.txtSpellSummary.Name = "txtSpellSummary";
-            this.txtSpellSummary.Size = new System.Drawing.Size(582, 212);
-            this.txtSpellSummary.TabIndex = 15;
+            this.webStats.Location = new System.Drawing.Point(23, 492);
+            this.webStats.MinimumSize = new System.Drawing.Size(20, 20);
+            this.webStats.Name = "webStats";
+            this.webStats.ScrollBarsEnabled = false;
+            this.webStats.Size = new System.Drawing.Size(582, 240);
+            this.webStats.TabIndex = 16;
+            // 
+            // cbxQLevel
+            // 
+            this.cbxQLevel.FormattingEnabled = true;
+            this.cbxQLevel.Location = new System.Drawing.Point(217, 453);
+            this.cbxQLevel.Name = "cbxQLevel";
+            this.cbxQLevel.Size = new System.Drawing.Size(50, 21);
+            this.cbxQLevel.TabIndex = 17;
+            // 
+            // cbxWLevel
+            // 
+            this.cbxWLevel.FormattingEnabled = true;
+            this.cbxWLevel.Location = new System.Drawing.Point(306, 453);
+            this.cbxWLevel.Name = "cbxWLevel";
+            this.cbxWLevel.Size = new System.Drawing.Size(50, 21);
+            this.cbxWLevel.TabIndex = 18;
+            // 
+            // cbxELevel
+            // 
+            this.cbxELevel.FormattingEnabled = true;
+            this.cbxELevel.Location = new System.Drawing.Point(393, 453);
+            this.cbxELevel.Name = "cbxELevel";
+            this.cbxELevel.Size = new System.Drawing.Size(50, 21);
+            this.cbxELevel.TabIndex = 19;
+            // 
+            // cbxRLevel
+            // 
+            this.cbxRLevel.FormattingEnabled = true;
+            this.cbxRLevel.Location = new System.Drawing.Point(471, 453);
+            this.cbxRLevel.Name = "cbxRLevel";
+            this.cbxRLevel.Size = new System.Drawing.Size(50, 21);
+            this.cbxRLevel.TabIndex = 20;
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(622, 678);
-            this.Controls.Add(this.txtSpellSummary);
+            this.ClientSize = new System.Drawing.Size(622, 865);
+            this.Controls.Add(this.cbxRLevel);
+            this.Controls.Add(this.cbxELevel);
+            this.Controls.Add(this.cbxWLevel);
+            this.Controls.Add(this.cbxQLevel);
+            this.Controls.Add(this.webStats);
             this.Controls.Add(this.btnPassive);
             this.Controls.Add(this.txtSummary);
             this.Controls.Add(this.btnR);
@@ -202,6 +243,7 @@
             this.Controls.Add(this.cbxChampions);
             this.Name = "Main";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Main_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -223,7 +265,11 @@
         private System.Windows.Forms.Button btnR;
         private System.Windows.Forms.TextBox txtSummary;
         private System.Windows.Forms.Button btnPassive;
-        private System.Windows.Forms.TextBox txtSpellSummary;
+        private System.Windows.Forms.WebBrowser webStats;
+        private System.Windows.Forms.ComboBox cbxQLevel;
+        private System.Windows.Forms.ComboBox cbxWLevel;
+        private System.Windows.Forms.ComboBox cbxELevel;
+        private System.Windows.Forms.ComboBox cbxRLevel;
     }
 }
 
