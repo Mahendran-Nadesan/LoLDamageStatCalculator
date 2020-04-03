@@ -15,5 +15,7 @@ namespace LoLDamageStatCalculator
         Task<ChampionListStatic> GetChampions();
 
         Task<ChampionStatic> GetChampion(string ChampionName);
+
+        Task<ChampionListStatic> GetChampionsShort();
     }
 }

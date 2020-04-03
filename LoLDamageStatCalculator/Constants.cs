@@ -10,6 +10,8 @@ namespace LoLDamageStatCalculator
     {
         public const int MaxChampionLevel = 18;
 
+        public const string StaticDataURL = "http://ddragon.leagueoflegends.com/cdn/";
+
         public const string StaticChampionVersion = "9.24.2"; // need to find out how to get the latest from RiotSharp, or directly from RiotAPI. See https://ddragon.leagueoflegends.com/realms/euw.json and https://ddragon.leagueoflegends.com/api/versions.json
 
         public enum SummaryType

@@ -50,5 +50,19 @@ namespace LoLDamageStatCalculator
                 throw ex;
             }
         }
+
+        public async Task<ChampionListStatic> GetChampionsShort()
+        {
+            try
+            {
+                ChampionListStatic ChampionsList = await ApiInstance.Champions.GetAllAsync(Constants.StaticChampionVersion, Language.en_US, false);
+                return ChampionsList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw ex;
+            }
+        }
     }
 }

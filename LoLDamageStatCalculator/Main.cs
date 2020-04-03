@@ -33,6 +33,7 @@ namespace LoLDamageStatCalculator
         public Main()
         {
             InitializeComponent();
+            //TopLevel = true;
         }
 
         #region MODE & MODE CHANGING EVENTS
@@ -183,6 +184,7 @@ namespace LoLDamageStatCalculator
         {
             // did not use addrange(enumerable.range because the levels end up SHARING the datasource)
 
+            // prevent the select index changed event when we reset the spell level dropdown
             cbxQLevel.SelectedIndexChanged -= SetSpellLevel;
             cbxWLevel.SelectedIndexChanged -= SetSpellLevel;
             cbxELevel.SelectedIndexChanged -= SetSpellLevel;
@@ -489,6 +491,9 @@ namespace LoLDamageStatCalculator
             btnR.BackColor = Color.Gray;
         }
 
-
+        private void Main_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            MainInstance.MainMenu.Show();
+        }
     }
 }

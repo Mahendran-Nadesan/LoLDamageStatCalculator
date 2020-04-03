@@ -33,6 +33,11 @@ namespace LoLDamageStatCalculator
             throw new NotImplementedException();
         }
 
+        public Task<ChampionListStatic> GetChampionsShort()
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<DComboBox>> GetViewableChampionList()
         {
             throw new NotImplementedException();

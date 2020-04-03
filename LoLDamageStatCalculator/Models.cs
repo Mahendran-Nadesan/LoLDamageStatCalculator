@@ -8,6 +8,7 @@ using RiotSharp.Endpoints.Interfaces.Static;
 using RiotSharp.Endpoints.StaticDataEndpoint;
 using RiotSharp.Endpoints.StaticDataEndpoint.Champion;
 using RiotSharp.Endpoints.StaticDataEndpoint.Item;
+using RiotSharp.Endpoints.StaticDataEndpoint.Rune;
 using RiotSharp.Misc;
 
 
@@ -23,6 +24,8 @@ namespace LoLDamageStatCalculator
 
         public int ChampionLevel;
 
+        public List<ItemStatic> ItemData;
+
         public List<ItemStatic> ChampionItems = new List<ItemStatic>();
 
         public ChampionSpellStatic ChampionSpell;
@@ -31,7 +34,34 @@ namespace LoLDamageStatCalculator
 
         public int ChampionSpellLevel;
 
+        public List<RuneStatic> RuneData;
+
         public Constants.SummaryType ChampionSummaryType;
+
+        // calling this only works if we don't instantiate .Data initially, so only instantiate .Data in LoadInitialState() methods for different forms
+        public bool DataLoaded(string modelType)
+        {
+            if (this == null)
+                return false;
+
+            switch (modelType)
+            {
+                case "Champion":
+                    if (ChampionData == null)
+                        return false;
+                    return true;
+                case "Item":
+                    if (ItemData == null)
+                        return false;
+                    return true;
+                case "Rune":
+                    if (RuneData == null)
+                        return false;
+                    return true;
+                default:
+                    return true;
+            }
+        }
 
         /// <summary>
         /// 
